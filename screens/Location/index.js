@@ -16,6 +16,21 @@ import Status from './Status'
 import { MonoText } from '../../components/StyledText'
 import { DENIED, GRANTED, GRANTED_IN_USE, WAIT, BACKGROUND_UPDATE, BACKGROUND_GEOFENCE } from '../Constants'
 
+let setState
+
+TaskManager.defineTask(BACKGROUND_UPDATE, async ({ data: { locations }, error }) => {
+  await Promise.all(locations.map(async ({ coords }) => {
+    const result = await fetch(`http://192.168.1.14:3000/location/${coords.longitude}/${coords.latitude}`)
+  }))
+})
+
+TaskManager.defineTask(BACKGROUND_GEOFENCE, ({ data: { eventType, region }, error }) => {
+  const inMoscow = region.identifier === 'moscow' && eventType === Location.GeofencingEventType.Enter
+
+  if (setState) setState({ inMoscow })
+  if (inMoscow) fetch(`http://192.168.1.14:3000/location/moscow`)
+})
+
 class Loc extends React.Component {
   static navigationOptions = {
     header: null,
@@ -26,10 +41,16 @@ class Loc extends React.Component {
     inMoscow: false,
   }
 
-  componentDidMount = async () => {
+  componentDidMount = () => {
     this.askLocationPermission()
     this.startBackgroundUpdate()
     this.listeningToMoscow()
+
+    setState = (s) => this.setState(s)
+  }
+
+  componentWillUnmount = () => {
+    setState = null
   }
   
   askLocationPermission = async () => {
@@ -55,21 +76,10 @@ class Loc extends React.Component {
   }
 
   startBackgroundUpdate = () => {
-    TaskManager.defineTask(BACKGROUND_UPDATE, async ({ data: { locations }, error }) => {
-      await Promise.all(locations.map(async ({ coords }) => {
-        const result = await fetch(`http://192.168.1.14:3000/location/${coords.longitude}/${coords.latitude}`)
-      }))
-    })
     Location.startLocationUpdatesAsync(BACKGROUND_UPDATE)
   }
 
   listeningToMoscow = () => {
-    TaskManager.defineTask(BACKGROUND_GEOFENCE, ({ data: { eventType, region }, error }) => {
-      const inMoscow = region.identifier === 'moscow' && eventType === Location.GeofencingEventType.Enter
-
-      this.setState({ inMoscow })
-      if (inMoscow) fetch(`http://192.168.1.14:3000/location/moscow`)
-    })
     Location.startGeofencingAsync(BACKGROUND_GEOFENCE, [
       {
         identifier: 'moscow',
@@ -99,7 +109,7 @@ class Loc extends React.Component {
         </View>
         <Status permissionStatus={permissionStatus} />
 
-        {inMoscow && <Text>Welcome to Moscow</Text>}
+        {inMoscow && <Text style={styles.welcomeText} >Welcome to Moscow</Text>}
       </ScrollView>
     )
   }
@@ -124,6 +134,10 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginTop: 3,
     marginLeft: -10,
+  },
+  welcomeText: {
+    textAlign: 'center',
+    marginTop: 50,
   },
 })
 
