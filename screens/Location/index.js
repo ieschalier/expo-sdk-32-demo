@@ -25,6 +25,11 @@ TaskManager.defineTask(BACKGROUND_UPDATE, async ({ data: { locations }, error })
     }))
   } catch (error) {
   }
+
+  store.set('locations', [
+    ...store.get('locations', []),
+    ...locations.map(v => v.coords)
+  ])
 })
 
 TaskManager.defineTask(BACKGROUND_GEOFENCE, ({ data: { eventType, region }, error }) => {
