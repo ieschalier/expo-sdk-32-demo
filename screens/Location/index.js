@@ -19,13 +19,6 @@ import { MonoText } from '../../components/StyledText'
 import { DENIED, GRANTED, GRANTED_IN_USE, WAIT, BACKGROUND_UPDATE, BACKGROUND_GEOFENCE } from '../Constants'
 
 TaskManager.defineTask(BACKGROUND_UPDATE, async ({ data: { locations }, error }) => {
-  try {
-    await Promise.all(locations.map(async ({ coords }) => {
-      const result = await fetch(`http://192.168.1.14:3000/location/${coords.longitude}/${coords.latitude}`)
-    }))
-  } catch (error) {
-  }
-
   store.set('locations', [
     ...store.get('locations', []),
     ...locations.map(v => v.coords)
@@ -36,10 +29,6 @@ TaskManager.defineTask(BACKGROUND_GEOFENCE, ({ data: { eventType, region }, erro
   const inMoscow = region.identifier === 'moscow' && eventType === Location.GeofencingEventType.Enter
 
   store.set('inMoscow', inMoscow)
-  try {
-    if (inMoscow) fetch(`http://192.168.1.14:3000/location/moscow`)
-  } catch (error) {
-  }
 })
 
 class Loc extends React.Component {
