@@ -90,7 +90,7 @@ class Loc extends React.Component {
   }
 
   startBackgroundUpdate = () => {
-    Location.startLocationUpdatesAsync(BACKGROUND_UPDATE)
+    Location.startLocationUpdatesAsync(BACKGROUND_UPDATE, { accuracy: Location.Accuracy.Low })
   }
 
   listeningToMoscow = () => {
