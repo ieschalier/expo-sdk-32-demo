@@ -11,12 +11,12 @@ import {
 import { WebBrowser, Permissions, Location, TaskManager } from 'expo'
 import { Ionicons } from '@expo/vector-icons'
 
+import store from '../../store'
+
 import Status from './Status'
 
 import { MonoText } from '../../components/StyledText'
 import { DENIED, GRANTED, GRANTED_IN_USE, WAIT, BACKGROUND_UPDATE, BACKGROUND_GEOFENCE } from '../Constants'
-
-let setState
 
 TaskManager.defineTask(BACKGROUND_UPDATE, async ({ data: { locations }, error }) => {
   await Promise.all(locations.map(async ({ coords }) => {
@@ -27,7 +27,7 @@ TaskManager.defineTask(BACKGROUND_UPDATE, async ({ data: { locations }, error })
 TaskManager.defineTask(BACKGROUND_GEOFENCE, ({ data: { eventType, region }, error }) => {
   const inMoscow = region.identifier === 'moscow' && eventType === Location.GeofencingEventType.Enter
 
-  if (setState) setState({ inMoscow })
+  store.set('inMoscow', inMoscow)
   if (inMoscow) fetch(`http://192.168.1.14:3000/location/moscow`)
 })
 
@@ -46,11 +46,14 @@ class Loc extends React.Component {
     this.startBackgroundUpdate()
     this.listeningToMoscow()
 
-    setState = (s) => this.setState(s)
+    this.unsubscribe = store.subscribe(
+      "inMoscow",
+      (inMoscow) => this.setState({ inMoscow }),
+    )
   }
 
   componentWillUnmount = () => {
-    setState = null
+    this.unsubscribe()
   }
   
   askLocationPermission = async () => {

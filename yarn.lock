@@ -652,6 +652,11 @@
     pouchdb-collections "^1.0.1"
     tiny-queue "^0.2.1"
 
+"@fromscratch/store@^1.0.0-beta.2":
+  version "1.0.0-beta.2"
+  resolved "https://registry.npmjs.org/@fromscratch/store/-/store-1.0.0-beta.2.tgz#577e23c5d39a2e54af07a073217bc631716074c0"
+  integrity sha512-4AuhmyyQwGOTC2Su6EcdmeetU8K8YA+HAnJtNxX7pkxngBJw0xa7Gszi6+86Cr3jNPBOSghNRrbjT/5K0kUUIA==
+
 "@react-navigation/core@3.0.2":
   version "3.0.2"
   resolved "https://registry.npmjs.org/@react-navigation/core/-/core-3.0.2.tgz#8631801533a27d034a3b8421dfd0510a9f27dcf3"
