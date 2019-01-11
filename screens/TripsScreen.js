@@ -3,39 +3,25 @@ import { StyleSheet } from 'react-native'
 import { MapView } from 'expo'
 
 import store from '../store'
+import useStore from '../store/useStore'
 
-export default class TripsScreen extends React.Component {
-  static navigationOptions = {
-    title: 'Trips',
-  }
+const TripsScreen = () => {
+  const locations = useStore('locations') || []
 
-  state = {
-    locations: store.get('locations', []),
-  }
-
-  componentDidMount = () => {
-    this.unsubscribe = store.subscribe(
-      'locations',
-      (locations) => this.setState({ locations }),
-    )
-  }
-
-  componentWillUnmount = () => {
-    this.unsubscribe()
-  }
-
-  render() {
-    const { locations } = this.state
-
-    return (
-      <MapView style={styles.container}>
-        {locations.map((coord, i) => (
-          <MapView.Marker key={i} coordinate={coord} />
-        ))}
-      </MapView>
-    )
-  }
+  return (
+    <MapView style={styles.container}>
+      {locations.map((coord, i) => (
+        <MapView.Marker key={i} coordinate={coord} />
+      ))}
+    </MapView>
+  )
 }
+
+TripsScreen.navigationOptions = {
+  title: 'Trips',
+}
+
+export default TripsScreen
 
 const styles = StyleSheet.create({
   container: {
